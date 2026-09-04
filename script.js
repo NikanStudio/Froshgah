@@ -6,16 +6,10 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_KEY
 );
 
+
 let allAds = [];
 let currentCategory = "all";
 
-const categoryNames = {
-    digital: "دیجیتال",
-    car: "خودرو",
-    home: "خانه",
-    clothes: "پوشاک",
-    other: "سایر"
-};
 
 const categoryIcons = {
     digital: "📱",
@@ -26,17 +20,24 @@ const categoryIcons = {
 };
 
 
-/* شروع سایت */
+/* =========================
+   شروع سایت
+========================= */
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
 
-    await loadAds();
-    await updateUserInterface();
+        await updateUserInterface();
+        await loadAds();
 
-});
+    }
+);
 
 
-/* باز و بسته کردن پنجره‌ها */
+/* =========================
+   پنجره‌ها
+========================= */
 
 function openAuth() {
 
@@ -51,12 +52,14 @@ async function openAddAd() {
 
     const {
         data: {
-            session
+            user
         }
-    } = await supabaseClient.auth.getSession();
+    } = await supabaseClient
+        .auth
+        .getUser();
 
 
-    if (!session) {
+    if (!user) {
 
         alert(
             "برای ثبت آگهی ابتدا وارد حساب کاربری خود شو."
@@ -85,7 +88,9 @@ function closeModal(id) {
 }
 
 
-/* ثبت‌نام و ورود */
+/* =========================
+   ورود و ثبت‌نام
+========================= */
 
 async function loginUser() {
 
@@ -121,15 +126,19 @@ async function loginUser() {
     }
 
 
+    /* ابتدا تلاش برای ورود */
+
     const {
         data: loginData,
         error: loginError
-    } = await supabaseClient.auth.signInWithPassword({
+    } = await supabaseClient
+        .auth
+        .signInWithPassword({
 
-        email: email,
-        password: password
+            email: email,
+            password: password
 
-    });
+        });
 
 
     if (!loginError && loginData.user) {
@@ -141,26 +150,37 @@ async function loginUser() {
         );
 
         await updateUserInterface();
+        await loadAds();
 
         return;
 
     }
 
 
+    /* اگر ورود انجام نشد، ثبت‌نام */
+
     const {
         data: signupData,
         error: signupError
-    } = await supabaseClient.auth.signUp({
+    } = await supabaseClient
+        .auth
+        .signUp({
 
-        email: email,
-        password: password
+            email: email,
+            password: password,
 
-    });
+            options: {
+                emailRedirectTo:
+                    "https://nikanstudio.github.io/Froshgah/"
+            }
+
+        });
 
 
     if (signupError) {
 
         alert(
+            "خطا: " +
             signupError.message
         );
 
@@ -173,8 +193,17 @@ async function loginUser() {
 
         closeModal("authModal");
 
+        document
+            .getElementById("emailInput")
+            .value = "";
+
+        document
+            .getElementById("passwordInput")
+            .value = "";
+
+
         alert(
-            "حساب ساخته شد. ایمیلت را برای تأیید بررسی کن."
+            "حساب ساخته شد! اگر ایمیل تأیید دریافت کردی، آن را تأیید کن."
         );
 
         await updateUserInterface();
@@ -184,15 +213,19 @@ async function loginUser() {
 }
 
 
-/* نمایش وضعیت کاربر */
+/* =========================
+   رابط کاربری کاربر
+========================= */
 
 async function updateUserInterface() {
 
     const {
         data: {
-            session
+            user
         }
-    } = await supabaseClient.auth.getSession();
+    } = await supabaseClient
+        .auth
+        .getUser();
 
 
     const loginButton = document.querySelector(
@@ -200,7 +233,14 @@ async function updateUserInterface() {
     );
 
 
-    if (session) {
+    if (!loginButton) {
+
+        return;
+
+    }
+
+
+    if (user) {
 
         loginButton.textContent = "خروج";
 
@@ -208,7 +248,8 @@ async function updateUserInterface() {
 
     } else {
 
-        loginButton.textContent = "ورود / ثبت‌نام";
+        loginButton.textContent =
+            "ورود / ثبت‌نام";
 
         loginButton.onclick = openAuth;
 
@@ -217,22 +258,44 @@ async function updateUserInterface() {
 }
 
 
-/* خروج */
+/* =========================
+   خروج
+========================= */
 
 async function logoutUser() {
 
-    await supabaseClient.auth.signOut();
+    const {
+        error
+    } = await supabaseClient
+        .auth
+        .signOut();
+
+
+    if (error) {
+
+        alert(
+            "خروج انجام نشد."
+        );
+
+        return;
+
+    }
+
 
     alert(
-        "از حساب خارج شدی."
+        "از حساب بازینو خارج شدی."
     );
 
+
     await updateUserInterface();
+    await loadAds();
 
 }
 
 
-/* بررسی اولیه آگهی */
+/* =========================
+   بررسی خودکار آگهی
+========================= */
 
 function checkAdContent(
     title,
@@ -240,8 +303,11 @@ function checkAdContent(
 ) {
 
     const text = (
-        title + " " + description
-    ).toLowerCase();
+        title +
+        " " +
+        description
+    )
+        .toLowerCase();
 
 
     const blockedWords = [
@@ -258,7 +324,9 @@ function checkAdContent(
 
     for (const word of blockedWords) {
 
-        if (text.includes(word)) {
+        if (
+            text.includes(word)
+        ) {
 
             return false;
 
@@ -272,7 +340,9 @@ function checkAdContent(
 }
 
 
-/* ثبت آگهی */
+/* =========================
+   ثبت آگهی
+========================= */
 
 async function addAd() {
 
@@ -281,18 +351,22 @@ async function addAd() {
         .value
         .trim();
 
+
     const description = document
         .getElementById("adDescription")
         .value
         .trim();
 
+
     const price = document
         .getElementById("adPrice")
         .value;
 
+
     const category = document
         .getElementById("adCategory")
         .value;
+
 
     const phone = document
         .getElementById("phoneInput")
@@ -316,18 +390,31 @@ async function addAd() {
     }
 
 
-    if (
-        !/^09\d{9}$/.test(phone)
-    ) {
+    if (Number(price) < 0) {
 
         alert(
-            "شماره موبایل باید با 09 شروع شود و ۱۱ رقم باشد."
+            "قیمت نمی‌تواند منفی باشد."
         );
 
         return;
 
     }
 
+
+    if (
+        !/^09\d{9}$/.test(phone)
+    ) {
+
+        alert(
+            "شماره موبایل باید ۱۱ رقم و با 09 شروع شود."
+        );
+
+        return;
+
+    }
+
+
+    /* بررسی خودکار */
 
     if (
         !checkAdContent(
@@ -348,14 +435,17 @@ async function addAd() {
     const {
         data: {
             user
-        }
-    } = await supabaseClient.auth.getUser();
+        },
+        error: userError
+    } = await supabaseClient
+        .auth
+        .getUser();
 
 
-    if (!user) {
+    if (userError || !user) {
 
         alert(
-            "ابتدا وارد حساب خود شو."
+            "برای ثبت آگهی ابتدا وارد حساب خود شو."
         );
 
         openAuth();
@@ -371,17 +461,30 @@ async function addAd() {
         .from("ads")
         .insert({
 
-            user_id: user.id,
-            title: title,
-            description: description,
-            price: Number(price),
-            category: category,
-            phone: phone
+            user_id:
+                user.id,
+
+            title:
+                title,
+
+            description:
+                description,
+
+            price:
+                Number(price),
+
+            category:
+                category,
+
+            phone:
+                phone
 
         });
 
 
     if (error) {
+
+        console.error(error);
 
         alert(
             "خطا در ثبت آگهی: " +
@@ -393,22 +496,20 @@ async function addAd() {
     }
 
 
-    alert(
-        "آگهی با موفقیت منتشر شد."
-    );
-
-
     document
         .getElementById("adTitle")
         .value = "";
+
 
     document
         .getElementById("adDescription")
         .value = "";
 
+
     document
         .getElementById("adPrice")
         .value = "";
+
 
     document
         .getElementById("phoneInput")
@@ -417,14 +518,41 @@ async function addAd() {
 
     closeModal("adModal");
 
+
+    alert(
+        "آگهی با موفقیت منتشر شد!"
+    );
+
+
     await loadAds();
 
 }
 
 
-/* دریافت آگهی‌ها */
+/* =========================
+   دریافت آگهی‌ها
+========================= */
 
 async function loadAds() {
+
+    const grid = document.getElementById(
+        "adsGrid"
+    );
+
+
+    if (!grid) {
+
+        return;
+
+    }
+
+
+    grid.innerHTML = `
+        <div class="empty-state">
+            در حال دریافت آگهی‌ها...
+        </div>
+    `;
+
 
     const {
         data,
@@ -442,15 +570,13 @@ async function loadAds() {
 
     if (error) {
 
-        document
-            .getElementById("adsGrid")
-            .innerHTML = `
-                <div class="empty-state">
-                    خطا در دریافت آگهی‌ها
-                </div>
-            `;
-
         console.error(error);
+
+        grid.innerHTML = `
+            <div class="empty-state">
+                خطا در دریافت آگهی‌ها
+            </div>
+        `;
 
         return;
 
@@ -459,14 +585,85 @@ async function loadAds() {
 
     allAds = data || [];
 
-    renderAds(allAds);
+
+    applyFilters();
 
 }
 
 
-/* نمایش آگهی‌ها */
+/* =========================
+   فیلترها
+========================= */
 
-function renderAds(ads) {
+function applyFilters() {
+
+    const searchInput = document.getElementById(
+        "searchInput"
+    );
+
+
+    const searchText = searchInput
+        ? searchInput.value
+            .trim()
+            .toLowerCase()
+        : "";
+
+
+    let result = [...allAds];
+
+
+    if (
+        currentCategory !== "all"
+    ) {
+
+        result = result.filter(ad => {
+
+            return (
+                ad.category ===
+                currentCategory
+            );
+
+        });
+
+    }
+
+
+    if (searchText) {
+
+        result = result.filter(ad => {
+
+            const title = String(
+                ad.title || ""
+            )
+                .toLowerCase();
+
+
+            const description = String(
+                ad.description || ""
+            )
+                .toLowerCase();
+
+
+            return (
+                title.includes(searchText) ||
+                description.includes(searchText)
+            );
+
+        });
+
+    }
+
+
+    renderAds(result);
+
+}
+
+
+/* =========================
+   نمایش آگهی‌ها
+========================= */
+
+async function renderAds(ads) {
 
     const grid = document.getElementById(
         "adsGrid"
@@ -477,16 +674,29 @@ function renderAds(ads) {
     );
 
 
-    count.textContent =
-        ads.length + " آگهی پیدا شد";
+    const {
+        data: {
+            user
+        }
+    } = await supabaseClient
+        .auth
+        .getUser();
+
+
+    if (count) {
+
+        count.textContent =
+            ads.length +
+            " آگهی پیدا شد";
+
+    }
 
 
     if (!ads.length) {
 
         grid.innerHTML = `
             <div class="empty-state">
-                هنوز آگهی‌ای ثبت نشده.<br>
-                اولین آگهی بازینو را تو ثبت کن!
+                هنوز آگهی‌ای پیدا نشد.
             </div>
         `;
 
@@ -498,7 +708,14 @@ function renderAds(ads) {
     grid.innerHTML = ads.map(ad => {
 
         const icon =
-            categoryIcons[ad.category] || "📦";
+            categoryIcons[
+                ad.category
+            ] || "📦";
+
+
+        const isOwner =
+            user &&
+            user.id === ad.user_id;
 
 
         return `
@@ -516,14 +733,18 @@ function renderAds(ads) {
 
                     <h3>
 
-                        ${escapeHTML(ad.title)}
+                        ${escapeHTML(
+                            ad.title
+                        )}
 
                     </h3>
 
 
                     <p>
 
-                        ${escapeHTML(ad.description)}
+                        ${escapeHTML(
+                            ad.description
+                        )}
 
                     </p>
 
@@ -532,7 +753,9 @@ function renderAds(ads) {
 
                         ${Number(
                             ad.price
-                        ).toLocaleString("fa-IR")}
+                        ).toLocaleString(
+                            "fa-IR"
+                        )}
 
                         تومان
 
@@ -543,12 +766,37 @@ function renderAds(ads) {
 
                         📞
 
-                        ${escapeHTML(ad.phone)}
+                        ${escapeHTML(
+                            ad.phone
+                        )}
 
                     </div>
 
 
-                    ${canDelete(ad.user_id)}
+                    ${
+
+                        isOwner
+
+                        ?
+
+                        `
+
+                        <button
+                            type="button"
+                            class="ad-delete"
+                            onclick="deleteAd('${ad.id}')">
+
+                            حذف آگهی
+
+                        </button>
+
+                        `
+
+                        :
+
+                        ""
+
+                    }
 
                 </div>
 
@@ -561,60 +809,25 @@ function renderAds(ads) {
 }
 
 
-/* آیا کاربر می‌تواند حذف کند؟ */
+/* =========================
+   حذف یک آگهی
+========================= */
 
-function canDelete(ownerId) {
-
-    const currentUserId = localStorage.getItem(
-        "bazinoUserId"
-    );
-
-
-    if (currentUserId === ownerId) {
-
-        return `
-
-            <button
-                type="button"
-                class="ad-delete"
-                onclick="deleteAd('${ownerId}')">
-
-                حذف آگهی
-
-            </button>
-
-        `;
-
-    }
-
-
-    return "";
-
-}
-
-
-/* حذف آگهی */
-
-async function deleteAd(ownerId) {
+async function deleteAd(adId) {
 
     const {
         data: {
             user
         }
-    } = await supabaseClient.auth.getUser();
+    } = await supabaseClient
+        .auth
+        .getUser();
 
 
     if (!user) {
 
-        return;
-
-    }
-
-
-    if (user.id !== ownerId) {
-
         alert(
-            "فقط صاحب آگهی می‌تواند آن را حذف کند."
+            "ابتدا وارد حساب خود شو."
         );
 
         return;
@@ -622,12 +835,12 @@ async function deleteAd(ownerId) {
     }
 
 
-    const confirmDelete = confirm(
-        "آیا مطمئنی که می‌خواهی آگهی را حذف کنی؟"
+    const confirmed = confirm(
+        "آیا مطمئنی که می‌خواهی این آگهی را حذف کنی؟"
     );
 
 
-    if (!confirmDelete) {
+    if (!confirmed) {
 
         return;
 
@@ -640,6 +853,10 @@ async function deleteAd(ownerId) {
         .from("ads")
         .delete()
         .eq(
+            "id",
+            adId
+        )
+        .eq(
             "user_id",
             user.id
         );
@@ -647,13 +864,21 @@ async function deleteAd(ownerId) {
 
     if (error) {
 
+        console.error(error);
+
         alert(
-            "حذف آگهی انجام نشد."
+            "حذف آگهی انجام نشد: " +
+            error.message
         );
 
         return;
 
     }
+
+
+    alert(
+        "آگهی حذف شد."
+    );
 
 
     await loadAds();
@@ -661,111 +886,87 @@ async function deleteAd(ownerId) {
 }
 
 
-/* جستجو */
+/* =========================
+   جستجو
+========================= */
 
 function searchAds() {
 
-    const text = document
-        .getElementById("searchInput")
-        .value
-        .trim()
-        .toLowerCase();
-
-
-    const result = allAds.filter(ad => {
-
-        return (
-            ad.title
-                .toLowerCase()
-                .includes(text)
-
-            ||
-
-            ad.description
-                .toLowerCase()
-                .includes(text)
-        );
-
-    });
-
-
-    renderAds(result);
+    applyFilters();
 
 }
 
 
-/* دسته‌بندی */
+/* =========================
+   دسته‌بندی
+========================= */
 
 function filterCategory(category) {
 
     currentCategory = category;
 
-
-    if (category === "all") {
-
-        renderAds(allAds);
-
-        return;
-
-    }
-
-
-    const result = allAds.filter(ad => {
-
-        return (
-            ad.category === category
-        );
-
-    });
-
-
-    renderAds(result);
+    applyFilters();
 
 }
 
 
-/* جلوگیری از HTML ناخواسته */
+/* =========================
+   جلوگیری از HTML ناخواسته
+========================= */
 
-function escapeHTML(text) {
+function escapeHTML(value) {
 
-    const div = document.createElement(
-        "div"
-    );
+    const div =
+        document.createElement("div");
 
-    div.textContent = text;
+
+    div.textContent =
+        value || "";
+
 
     return div.innerHTML;
 
 }
 
 
-/* وضعیت ورود کاربر */
+/* =========================
+   تغییر وضعیت ورود
+========================= */
 
-supabaseClient.auth.onAuthStateChange(
-    (
-        event,
-        session
-    ) => {
+supabaseClient
+    .auth
+    .onAuthStateChange(
+        () => {
 
-        if (session?.user) {
+            updateUserInterface();
+            loadAds();
 
-            localStorage.setItem(
-                "bazinoUserId",
-                session.user.id
+        }
+    );
+
+
+/* =========================
+   جستجو با Enter
+========================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const searchInput =
+            document.getElementById(
+                "searchInput"
             );
 
-        } else {
 
-            localStorage.removeItem(
-                "bazinoUserId"
+        if (searchInput) {
+
+            searchInput.addEventListener(
+                "input",
+                searchAds
             );
 
         }
-
-
-        updateUserInterface();
-
-        loadAds();
 
     }
 );
