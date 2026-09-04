@@ -248,7 +248,6 @@
 
                 </button>
 
-
             </div>
 
         </section>
@@ -288,9 +287,7 @@
 
             </div>
 
-
         </section>
-
 
     </main>
 
@@ -316,12 +313,13 @@
             </button>
 
 
-            <h2>ورود به بازینو</h2>
+            <h2>ورود یا ثبت‌نام</h2>
 
 
             <p>
 
-                با ایمیل وارد شو یا حساب جدید بساز.
+                با ایمیل و رمز عبور وارد شو.
+                اگر حساب نداشته باشی، برایت حساب جدید ساخته می‌شود.
 
             </p>
 
@@ -348,7 +346,6 @@
                 ورود / ثبت‌نام
 
             </button>
-
 
         </div>
 
@@ -381,7 +378,7 @@
 
             <p>
 
-                آگهی شما قبل از انتشار بررسی می‌شود.
+                آگهی قبل از انتشار به‌صورت خودکار بررسی می‌شود.
 
             </p>
 
@@ -389,12 +386,14 @@
             <input
                 id="adTitle"
                 type="text"
-                placeholder="عنوان آگهی">
+                placeholder="عنوان آگهی"
+                maxlength="100">
 
 
             <textarea
                 id="adDescription"
-                placeholder="توضیحات آگهی"></textarea>
+                placeholder="توضیحات آگهی"
+                maxlength="1500"></textarea>
 
 
             <input
@@ -429,9 +428,7 @@
 
                 <option value="other">
                     سایر
-
                 </option>
-
 
             </select>
 
@@ -440,13 +437,14 @@
                 id="phoneInput"
                 type="tel"
                 placeholder="شماره موبایل فروشنده"
-                inputmode="tel">
+                inputmode="tel"
+                maxlength="11">
 
 
             <small>
 
-                شماره شما فقط برای افرادی که
-                آگهی را مشاهده می‌کنند قابل نمایش است.
+                شماره موبایل برای خریداران آگهی نمایش داده می‌شود.
+                آگهی نامناسب منتشر نخواهد شد.
 
             </small>
 
@@ -460,7 +458,6 @@
 
             </button>
 
-
         </div>
 
     </div>
@@ -473,9 +470,7 @@
 
         <div>
 
-
             <h3>بازینو</h3>
-
 
             <p>
 
@@ -483,12 +478,10 @@
 
             </p>
 
-
         </div>
 
 
         <div>
-
 
             <p>
 
@@ -511,12 +504,19 @@
 
             </p>
 
-
         </div>
-
 
     </footer>
 
+
+    <!-- SUPABASE -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+
+
+    <!-- SITE JAVASCRIPT -->
 
     <script src="script.js"></script>
 
