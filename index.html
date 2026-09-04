@@ -1,1 +1,526 @@
-Print ("Hello word")
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        بازینو | خرید و فروش آنلاین و آگهی رایگان
+    </title>
+
+    <meta
+        name="description"
+        content="بازینو پلتفرم خرید و فروش آنلاین است. آگهی رایگان ثبت کنید، کالاهای مورد نیاز خود را پیدا کنید و خرید و فروش آسان را تجربه کنید.">
+
+    <meta
+        name="keywords"
+        content="بازینو, bazino, خرید و فروش آنلاین, آگهی رایگان, خرید, فروش, کالای دست دوم">
+
+    <meta
+        name="author"
+        content="NIKAN STUDIO">
+
+    <meta
+        name="robots"
+        content="index, follow">
+
+    <link
+        rel="canonical"
+        href="https://nikanstudio.github.io/Froshgah/">
+
+    <meta
+        property="og:type"
+        content="website">
+
+    <meta
+        property="og:title"
+        content="بازینو | خرید و فروش آسان">
+
+    <meta
+        property="og:description"
+        content="در بازینو آگهی خود را رایگان ثبت کنید و خرید و فروش کنید.">
+
+    <meta
+        property="og:url"
+        content="https://nikanstudio.github.io/Froshgah/">
+
+    <meta
+        name="twitter:card"
+        content="summary">
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- HEADER -->
+
+    <header>
+
+        <a
+            class="logo"
+            href="./"
+            aria-label="صفحه اصلی بازینو">
+
+            <span>بازینو</span>
+
+            <small>BAZINO</small>
+
+        </a>
+
+
+        <div class="header-search">
+
+            <input
+                id="searchInput"
+                type="search"
+                placeholder="دنبال چی می‌گردی؟"
+                aria-label="جستجو در آگهی‌ها">
+
+            <button
+                type="button"
+                onclick="searchAds()"
+                aria-label="جستجو">
+
+                🔍
+
+            </button>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <button
+                type="button"
+                class="login-btn"
+                onclick="openAuth()">
+
+                ورود / ثبت‌نام
+
+            </button>
+
+
+            <button
+                type="button"
+                class="add-btn"
+                onclick="openAddAd()">
+
+                + ثبت آگهی
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+
+        <!-- HERO -->
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <h1>
+
+                    خرید و فروش آسان،
+                    <strong>در بازینو</strong>
+
+                </h1>
+
+
+                <p>
+
+                    کالایی که نیاز نداری را بفروش،
+                    یا چیزی که نیاز داری را پیدا کن.
+
+                </p>
+
+
+                <button
+                    type="button"
+                    class="hero-btn"
+                    onclick="openAddAd()">
+
+                    + ثبت آگهی رایگان
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- CATEGORIES -->
+
+        <section
+            class="categories-section"
+            aria-label="دسته‌بندی آگهی‌ها">
+
+
+            <div class="section-title">
+
+                <div>
+
+                    <h2>دسته‌بندی‌ها</h2>
+
+                    <span>
+                        سریع‌تر چیزی که می‌خواهی را پیدا کن
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="categories">
+
+
+                <button
+                    type="button"
+                    onclick="filterCategory('all')">
+
+                    <span>🏪</span>
+                    همه
+
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="filterCategory('digital')">
+
+                    <span>📱</span>
+                    دیجیتال
+
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="filterCategory('car')">
+
+                    <span>🚗</span>
+                    خودرو
+
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="filterCategory('home')">
+
+                    <span>🏠</span>
+                    خانه
+
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="filterCategory('clothes')">
+
+                    <span>👕</span>
+                    پوشاک
+
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="filterCategory('other')">
+
+                    <span>📦</span>
+                    سایر
+
+                </button>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- ADS -->
+
+        <section
+            class="ads-section"
+            aria-label="آگهی‌های بازینو">
+
+
+            <div class="section-title">
+
+                <div>
+
+                    <h2>آگهی‌های جدید</h2>
+
+                    <span id="adsCount">
+
+                        جدیدترین آگهی‌های بازینو
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="adsGrid"
+                class="ads-grid">
+
+
+                <!-- آگهی‌ها با JavaScript اضافه می‌شوند -->
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+    <!-- AUTH MODAL -->
+
+    <div
+        id="authModal"
+        class="modal">
+
+
+        <div class="modal-box">
+
+
+            <button
+                type="button"
+                class="close"
+                onclick="closeModal('authModal')"
+                aria-label="بستن">
+
+                ×
+
+            </button>
+
+
+            <h2>ورود به بازینو</h2>
+
+
+            <p>
+
+                با ایمیل وارد شو یا حساب جدید بساز.
+
+            </p>
+
+
+            <input
+                id="emailInput"
+                type="email"
+                placeholder="ایمیل شما"
+                autocomplete="email">
+
+
+            <input
+                id="passwordInput"
+                type="password"
+                placeholder="رمز عبور"
+                autocomplete="current-password">
+
+
+            <button
+                type="button"
+                class="primary-btn"
+                onclick="loginUser()">
+
+                ورود / ثبت‌نام
+
+            </button>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ADD AD MODAL -->
+
+    <div
+        id="adModal"
+        class="modal">
+
+
+        <div class="modal-box">
+
+
+            <button
+                type="button"
+                class="close"
+                onclick="closeModal('adModal')"
+                aria-label="بستن">
+
+                ×
+
+            </button>
+
+
+            <h2>ثبت آگهی جدید</h2>
+
+
+            <p>
+
+                آگهی شما قبل از انتشار بررسی می‌شود.
+
+            </p>
+
+
+            <input
+                id="adTitle"
+                type="text"
+                placeholder="عنوان آگهی">
+
+
+            <textarea
+                id="adDescription"
+                placeholder="توضیحات آگهی"></textarea>
+
+
+            <input
+                id="adPrice"
+                type="number"
+                placeholder="قیمت به تومان"
+                min="0">
+
+
+            <select id="adCategory">
+
+
+                <option value="digital">
+                    دیجیتال
+                </option>
+
+
+                <option value="car">
+                    خودرو
+                </option>
+
+
+                <option value="home">
+                    خانه
+                </option>
+
+
+                <option value="clothes">
+                    پوشاک
+                </option>
+
+
+                <option value="other">
+                    سایر
+
+                </option>
+
+
+            </select>
+
+
+            <input
+                id="phoneInput"
+                type="tel"
+                placeholder="شماره موبایل فروشنده"
+                inputmode="tel">
+
+
+            <small>
+
+                شماره شما فقط برای افرادی که
+                آگهی را مشاهده می‌کنند قابل نمایش است.
+
+            </small>
+
+
+            <button
+                type="button"
+                class="primary-btn"
+                onclick="addAd()">
+
+                ثبت آگهی
+
+            </button>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+
+        <div>
+
+
+            <h3>بازینو</h3>
+
+
+            <p>
+
+                خرید و فروش آسان، سریع و مطمئن.
+
+            </p>
+
+
+        </div>
+
+
+        <div>
+
+
+            <p>
+
+                پشتیبانی:
+
+                <a
+                    href="mailto:niksoly2020@gmail.com">
+
+                    niksoly2020@gmail.com
+
+                </a>
+
+            </p>
+
+
+            <p>
+
+                © 2026 BAZINO —
+                ساخته شده توسط NIKAN STUDIO
+
+            </p>
+
+
+        </div>
+
+
+    </footer>
+
+
+    <script src="script.js"></script>
+
+
+</body>
+
+</html>
